@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from .models import Book
+from .forms import ExampleForm 
 
 # blog/views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import permission_required
 from .models import Post
-from .forms import BookSearchForm
+
 
 @permission_required('blog.can_create', raise_exception=True)
 def create_post(request):
@@ -42,13 +43,20 @@ def book_detail(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     return render(request, 'bookshelf/book_detail.html', {'book': book})
 
-def search_books(request):
-    form = BookSearchForm(request.GET)
-    if form.is_valid():
-        search_query = form.cleaned_data['search_query']
-        books = Book.objects.filter(title__icontains=search_query)
+
+def example_view(request):
+    if request.method == 'POST':
+        form = ExampleForm(request.POST)
+        if form.is_valid():
+            # Process the form data
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            message = form.cleaned_data['message']
+            # Example action: you can save the data, send an email, etc.
+            return render(request, 'bookshelf/form_example.html', {'form': form, 'message': 'Form submitted successfully!'})
     else:
-        books = Book.objects.all()
-    
-    return render(request, 'bookshelf/book_list.html', {'books': books, 'form': form})
+        form = ExampleForm()
+
+    return render(request, 'bookshelf/form_example.html', {'form': form})
+
 
