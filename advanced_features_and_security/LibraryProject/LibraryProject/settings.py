@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%t+5(aejsxz)r0#v19h0=fbrv%lwcu4o*!du81z5at)4-@c(ub'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -49,7 +49,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',  # Add CSP middleware
 ]
+
+CSP_DEFAULT_SRC = ("'self'",)  # Only allow content from the same origin
+CSP_SCRIPT_SRC = ("'self'", 'https://trusted-source.com')  # Allow scripts from trusted sources
+CSP_STYLE_SRC = ("'self'", 'https://trusted-styles.com')  # Allow styles from trusted sources
 
 ROOT_URLCONF = 'LibraryProject.urls'
 
@@ -126,5 +131,34 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.CustomUser'
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
+
+
+SECURE_BROWSER_XSS_FILTER = True  # Enables browser XSS filtering
+X_FRAME_OPTIONS = 'DENY'  # Prevents the site from being embedded in an iframe
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevents browsers from guessing MIME types
+
+
+CSRF_COOKIE_SECURE = True  # Ensures CSRF cookie is only sent over HTTPS
+SESSION_COOKIE_SECURE = True  # Ensures session cookie is only sent over HTTPS
+
+### Security Measures Implemented
+
+"""1. **Secure Settings:**
+   - `DEBUG = False`: Ensures that debug information is not exposed in production.
+   - `SECURE_BROWSER_XSS_FILTER = True`: Enables browser-side XSS filtering.
+   - `X_FRAME_OPTIONS = 'DENY'`: Prevents the site from being embedded in an iframe.
+   - `CSRF_COOKIE_SECURE = True` & `SESSION_COOKIE_SECURE = True`: Ensure cookies are only sent over HTTPS.
+
+2. **CSRF Protection:**
+   - All form templates include `{% csrf_token %}` to prevent CSRF attacks.
+
+3. **SQL Injection Protection:**
+   - All user inputs are validated and queries are executed using Django's ORM to prevent SQL injection.
+
+4. **Content Security Policy (CSP):**
+   - Added a basic CSP header using `django-csp` middleware to block untrusted scripts and styles.
+"""
+
+
 
 
