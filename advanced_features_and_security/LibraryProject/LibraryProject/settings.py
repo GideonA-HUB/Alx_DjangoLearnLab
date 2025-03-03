@@ -132,6 +132,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
 
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True
+
+# Set HSTS to one year (in seconds), include subdomains and allow preloading
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
 
 SECURE_BROWSER_XSS_FILTER = True  # Enables browser XSS filtering
 X_FRAME_OPTIONS = 'DENY'  # Prevents the site from being embedded in an iframe
