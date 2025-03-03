@@ -1,0 +1,15 @@
+<!-- LibraryProject/templates/bookshelf/book_detail.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ book.title }}</title>
+</head>
+<body>
+    <h1>{{ book.title }}</h1>
+    <p>{{ book.description }}</p>
+    <p>Author: {{ book.author }}</p>
+    <p>Published: {{ book.publish_date }}</p>
+    <a href="{% url 'book_list' %}">Back to Book List</a>
+</body>
+</html>

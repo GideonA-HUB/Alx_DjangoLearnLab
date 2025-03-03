@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from .models import Book
 
 # blog/views.py
 from django.shortcuts import render, get_object_or_404, redirect
@@ -29,3 +30,14 @@ def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     post.delete()
     return redirect('post_list')
+
+def book_list(request):
+    # Fetch all books from the database
+    books = Book.objects.all()
+    return render(request, 'bookshelf/book_list.html', {'books': books})
+
+def book_detail(request, book_id):
+    # Fetch a single book by its ID, or return a 404 error if not found
+    book = get_object_or_404(Book, id=book_id)
+    return render(request, 'bookshelf/book_detail.html', {'book': book})
+
