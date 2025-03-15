@@ -21,16 +21,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         model = Author
         fields = ['name', 'books']
 
- """
-    Serializes data for the Book model.
-    Includes a custom validation to ensure that the publication year is not in the future.
 """
-
- """
-    Validates that the publication year is not in the future.
-"""
-
- """
     Serializes data for the Author model.
     Includes a nested BookSerializer to serialize related books.
 """

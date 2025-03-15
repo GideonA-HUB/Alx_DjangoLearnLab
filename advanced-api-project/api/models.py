@@ -14,14 +14,9 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
-    
 
- """
+
+"""
     Author model represents the author of a book.
     It contains the author's name.
-"""
-
- """
-    Book model represents a book written by an author.
-    It includes the book's title, publication year, and the author it is related to.
 """
