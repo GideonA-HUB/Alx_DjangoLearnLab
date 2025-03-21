@@ -2,6 +2,7 @@ from django import forms
 from .models import Post, Comment, Tag
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from taggit.forms import TagField, TagWidget
 
 # Extending the default UserCreationForm to add an email field
 class CustomUserCreationForm(UserCreationForm):
@@ -12,8 +13,8 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
 
 class PostForm(forms.ModelForm):
-    tags = forms.CharField(max_length=100, required=False, help_text="Add tags separated by commas")
-
+    tags = TagField(required=False, widget=TagWidget())
+    
     class Meta:
         model = Post
         fields = ['title', 'content', 'tags']
