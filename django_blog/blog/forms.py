@@ -13,11 +13,14 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
 
 class PostForm(forms.ModelForm):
-    tags = TagField(required=False, widget=TagWidget())
-    
     class Meta:
         model = Post
         fields = ['title', 'content', 'tags']
+        widgets = {
+            'tags': TagWidget(),  # Use TagWidget for the tags field
+        }
+
+    tags = TagField(required=False)  # This defines the TagField to use in the form
 
     def clean_tags(self):
         tag_names = self.cleaned_data['tags'].split(',')
