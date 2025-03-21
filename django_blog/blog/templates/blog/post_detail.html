@@ -27,3 +27,25 @@
     <button type="submit">Submit</button>
   </form>
 {% endblock %}
+
+<!-- blog/templates/blog/post_detail.html -->
+{% extends "base_generic.html" %}
+{% block content %}
+  <h1>{{ post.title }}</h1>
+  <p>{{ post.content }}</p>
+
+  <h2>Tags:</h2>
+  <p>
+    {% for tag in post.tags.all %}
+      <a href="{% url 'tag-detail' tag.name %}">{{ tag.name }}</a> 
+    {% endfor %}
+  </p>
+
+  <!-- Comment Section -->
+  <h3>Leave a Comment</h3>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+  </form>
+{% endblock %}
