@@ -22,13 +22,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['username', 'password', 'bio', 'profile_picture']
 
     def create(self, validated_data):
-        # Create user with the provided data
+        # Extract password to hash it later
         password = validated_data.pop('password')
-        user = User.objects.create(**validated_data)
-        user.set_password(password)  # Hash the password
+
+        # Create a new user using the custom manager's create_user method
+        user = User.objects.create_user(**validated_data)
+        
+        # Set the password hash (if not using create_user(), the password wouldn't be hashed)
+        user.set_password(password)
         user.save()
 
-        # Create a token for the newly created user
+        # Generate a token for the user
         token, created = Token.objects.get_or_create(user=user)
         
         return user, token
@@ -42,11 +46,12 @@ class LoginSerializer(serializers.Serializer):
         username = data.get('username')
         password = data.get('password')
 
-        # Check if username and password are correct
+        # Retrieve the user by the username
         user = User.objects.filter(username=username).first()
-        if user and user.check_password(password):
-            # If correct, create a token for the user
+        if user and user.check_password(password):  # Verify the password
+            # If password matches, generate a token for the user
             token, created = Token.objects.get_or_create(user=user)
             return {'token': token.key}
 
+        # Raise an error if username or password is invalid
         raise serializers.ValidationError('Invalid username or password')
