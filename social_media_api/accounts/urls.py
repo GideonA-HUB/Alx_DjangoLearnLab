@@ -5,7 +5,8 @@ from .views import FollowViewSet
 from .views import RegisterView, LoginView, UserProfile
 
 router = DefaultRouter()
-router.register(r'follow', FollowViewSet, basename='follow')
+router.register(r'follow', FollowUserView, basename='follow_user')
+
 
 
 urlpatterns = [

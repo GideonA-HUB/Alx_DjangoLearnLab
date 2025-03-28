@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
+from .models import CustomUser
 from rest_framework.permissions import IsAuthenticated
 from .serializers import RegisterSerializer, UserSerializer,  LoginSerializer
 
@@ -58,68 +59,55 @@ class UserProfile(APIView):
 
 
 class FollowUserView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]  # Ensure only authenticated users can follow/unfollow
+    queryset = CustomUser.objects.all()  # Use CustomUser directly to fetch all users
 
-    def post(self, request, *args, **kwargs):
-        user_to_follow = User.objects.get(username=request.data.get('username'))
-        user = request.user  # Get the authenticated user
+    def get_object(self, pk):
+        """
+        Retrieve a specific user based on the pk (primary key).
+        """
+        return CustomUser.objects.get(pk=pk)
+
+    @action(detail=True, methods=['post'])
+    def follow_user(self, request, pk=None):
+        """
+        Follow another user by adding to the following relationship.
+        """
+        try:
+            user_to_follow = self.get_object(pk)  # Get the user to be followed
+        except CustomUser.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user  # The user who is making the follow request
         
+        # Prevent users from following themselves
         if user == user_to_follow:
             return Response({"detail": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         # Add the user_to_follow to the current user's following field
         user.following.add(user_to_follow)
         user.save()
-        
+
         return Response({"detail": f"You are now following {user_to_follow.username}."}, status=status.HTTP_200_OK)
 
-class UnfollowUserView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    @action(detail=True, methods=['post'])
+    def unfollow_user(self, request, pk=None):
+        """
+        Unfollow a user by removing from the following relationship.
+        """
+        try:
+            user_to_unfollow = self.get_object(pk)  # Get the user to be unfollowed
+        except CustomUser.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    def post(self, request, *args, **kwargs):
-        user_to_unfollow = User.objects.get(username=request.data.get('username'))
-        user = request.user  # Get the authenticated user
+        user = request.user  # The user who is making the unfollow request
         
+        # Prevent users from unfollowing themselves
         if user == user_to_unfollow:
             return Response({"detail": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Remove the user_to_unfollow from the current user's following field
         user.following.remove(user_to_unfollow)
         user.save()
-        
+
         return Response({"detail": f"You have unfollowed {user_to_unfollow.username}."}, status=status.HTTP_200_OK)
-
-# You can also use function-based views (FBVs) like this:
-
-@api_view(['POST'])
-def follow_user(request):
-    if request.user.is_authenticated:
-        user_to_follow = User.objects.get(username=request.data.get('username'))
-        user = request.user
-        
-        if user == user_to_follow:
-            return Response({"detail": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        user.following.add(user_to_follow)
-        user.save()
-        
-        return Response({"detail": f"You are now following {user_to_follow.username}."}, status=status.HTTP_200_OK)
-    else:
-        return Response({"detail": "Authentication required."}, status=status.HTTP_403_FORBIDDEN)
-
-
-@api_view(['POST'])
-def unfollow_user(request):
-    if request.user.is_authenticated:
-        user_to_unfollow = User.objects.get(username=request.data.get('username'))
-        user = request.user
-        
-        if user == user_to_unfollow:
-            return Response({"detail": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
-
-        user.following.remove(user_to_unfollow)
-        user.save()
-        
-        return Response({"detail": f"You have unfollowed {user_to_unfollow.username}."}, status=status.HTTP_200_OK)
-    else:
-        return Response({"detail": "Authentication required."}, status=status.HTTP_403_FORBIDDEN)
