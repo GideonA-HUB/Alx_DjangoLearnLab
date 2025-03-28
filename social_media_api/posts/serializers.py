@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 # Post Serializer
 class PostSerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects.all(), read_only=True)
+    author = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Post
@@ -13,7 +13,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 # Comment Serializer
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects.all(), read_only=True)
+    author = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Comment

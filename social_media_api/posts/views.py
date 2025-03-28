@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import filters
 from rest_framework import viewsets, permissions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Post, Comment
@@ -12,10 +13,16 @@ from .permissions import IsOwnerOrReadOnly
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated]
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     ordering_fields = ['created_at']
     search_fields = ['title', 'content']
+
+    def get_queryset(self):
+        # Modify the queryset to show posts from users the logged-in user follows
+        user = self.request.user
+        following_users = user.following.all()
+        return Post.objects.filter(author__in=following_users).order_by('-created_at')
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
