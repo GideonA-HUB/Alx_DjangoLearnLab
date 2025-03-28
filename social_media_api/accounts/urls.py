@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
 from .views import FollowViewSet
+from .views import follow_user, unfollow_user
 from .views import RegisterView, LoginView, UserProfile
 
 router = DefaultRouter()
@@ -16,4 +17,6 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('follow/', views.FollowUserView.as_view(), name='follow_user'),
     path('unfollow/', views.UnfollowUserView.as_view(), name='unfollow_user'),
+    path('follow/<int:user_id>/', follow_user, name='follow_user'),
+    path('unfollow/<int:user_id>/', unfollow_user, name='unfollow_user'),
 ]

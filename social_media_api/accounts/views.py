@@ -111,3 +111,48 @@ class FollowUserView(generics.GenericAPIView):
         user.save()
 
         return Response({"detail": f"You have unfollowed {user_to_unfollow.username}."}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def follow_user(request, user_id):
+    """
+    Follow a user by adding the user_id to the current user's following list.
+    """
+    # Ensure the user is authenticated
+    if not request.user.is_authenticated:
+        return JsonResponse({'detail': 'Authentication credentials were not provided.'}, status=401)
+
+    current_user = request.user
+    # Get the user to be followed
+    user_to_follow = get_object_or_404(User, id=user_id)
+
+    # Avoid self-following
+    if current_user == user_to_follow:
+        return JsonResponse({'detail': 'You cannot follow yourself.'}, status=400)
+
+    # Add the user to the following list if not already followed
+    if user_to_follow not in current_user.following.all():
+        current_user.following.add(user_to_follow)
+        return JsonResponse({'detail': f'You are now following {user_to_follow.username}.'}, status=200)
+    else:
+        return JsonResponse({'detail': 'You are already following this user.'}, status=400)
+
+@api_view(['POST'])
+def unfollow_user(request, user_id):
+    """
+    Unfollow a user by removing the user_id from the current user's following list.
+    """
+    # Ensure the user is authenticated
+    if not request.user.is_authenticated:
+        return JsonResponse({'detail': 'Authentication credentials were not provided.'}, status=401)
+
+    current_user = request.user
+    # Get the user to be unfollowed
+    user_to_unfollow = get_object_or_404(User, id=user_id)
+
+    # Ensure the user is following the user they want to unfollow
+    if user_to_unfollow not in current_user.following.all():
+        return JsonResponse({'detail': 'You are not following this user.'}, status=400)
+
+    # Remove the user from the following list
+    current_user.following.remove(user_to_unfollow)
+    return JsonResponse({'detail': f'You have unfollowed {user_to_unfollow.username}.'}, status=200)
