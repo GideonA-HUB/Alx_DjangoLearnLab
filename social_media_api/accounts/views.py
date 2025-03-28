@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework import generics
 from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.views import APIView
@@ -7,7 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
-from .serializers import RegistrationSerializer, UserSerializer,  LoginSerializer
+from .serializers import RegisterSerializer, UserSerializer,  LoginSerializer
 
 class RegisterView(generics.CreateAPIView):
     """
